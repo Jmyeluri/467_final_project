@@ -16,39 +16,97 @@ function initMap() {
   var count = 0;
   var coords = [];
 
-  function geocodeLatLng(geocoder, map, infowindow, latlng) {
-        geocoder.geocode({'location': latlng}, function(results, status) {
-          if (status === 'OK') {
-            if (results[0]) {
-              //map.setZoom(11);
-              var marker = new google.maps.Marker({
-                position: latlng,
-                map: map
-              });
-              infowindow.setContent(results[0].formatted_address);
-              infowindow.open(map, marker);
-            }
-          } else {
-            if(status == 'OVER_QUERY_LIMIT'){
-              window.alert('Geocoder failed due to: ' + status);
-            }
-          }
+  function createMarker(place) {
+      var photos = place.photos;
+      if(photos){
+        var marker = new google.maps.Marker({
+          map: map,
+          position: place.geometry.location,
+          icon: photos[0].getUrl({maxWidth: 35, maxHeight: 35})
         });
+      }
+      else{
+        var marker = new google.maps.Marker({
+          map: map,
+          position: place.geometry.location,
+        });
+      }
+      markers.push(marker);
+      google.maps.event.addListener(marker, 'click', function() {
+        infowindow.setContent(('<div><strong>' + place.name + '</strong><br>' +
+                  'Place ID: ' + place.place_id + '<br>' +
+                  place.types + '</div>'));
+        infowindow.open(map, this);
+      });
+    }
+
+
+
+  function callback(results, status) {
+    if (status == google.maps.places.PlacesServiceStatus.OK) {
+      for (var i = 0; i < results.length; i++) {
+        var place = results[i];
+        createMarker(results[i]);
+      }
+    }
+  }
+
+
+
+  function geocodeLatLng(geocoder, map, infowindow, latLng) {
+  var placesRequest = {
+    location: latLng,
+    radius: '500'
+  };
+  service = new google.maps.places.PlacesService(map);
+  service.nearbySearch(placesRequest, callback);
+  /*
+  geocoder.geocode({'location': latLng}, function(results, status) {
+    if (status === 'OK') {
+      if (results[0]) {
+
+        //map.setZoom(11);
+        var marker = new google.maps.Marker({
+          position: latLng,
+          map: map
+        });
+        infowindow.setContent(results[0].formatted_address);
+        infowindow.open(map, marker);
+      }
+    } else {
+      if(status == 'OVER_QUERY_LIMIT'){
+        window.alert('Geocoder failed due to: ' + status);
+      }
+    }
+
+  });*/
+  }
+  function deleteMarkers() {
+    for (var i = 0; i < markers.length; i++) {
+      markers[i].setMap(null);
+    }
+    markers = [];
   }
   var geocoder = new google.maps.Geocoder;
   var infowindow = new google.maps.InfoWindow;
+  var polyLine = new google.maps.Polyline({
+    map: map,
+    strokeColor: '#FF0000',
+    strokeOpacity: 1.0,
+    strokeWeight: 10
+  });
 
   // Add a listener for idle event and call getElevation on a random set of marker in the bound
   google.maps.event.addListener(map, 'click', function () {
     console.log(count);
-    var polyLine = new google.maps.Polyline({
+    polyLine.setMap(null);
+    deleteMarkers();
+    polyLine = new google.maps.Polyline({
       map: map,
       strokeColor: '#FF0000',
       strokeOpacity: 1.0,
       strokeWeight: 10
     });
-
-
     google.maps.event.addListener(map, 'mousemove', function (event) {
         count++;
         var lat = event.latLng.lat();
@@ -61,6 +119,9 @@ function initMap() {
           console.log(coords);
           geocodeLatLng(geocoder, map, infowindow, latLng);
         }
+        google.maps.event.addListener(polyLine, 'click', function(event) {
+          google.maps.event.clearListeners(map, 'mousemove');
+        });
     });
   });
 }
