@@ -15,13 +15,39 @@ function initMap() {
   overlay.setMap(map);
   var count = 0;
   var coords = [];
+  var request;
+  var gettingData = false;
+  var weather;
+  var openWeatherMapKey = "339b52f9b02b6d39e0aa17eae154d267";
 
+  // Make the weather request
+  var getWeather = function(lat, lng) {
+    gettingData = true;
+    var requestString = "http://api.openweathermap.org/data/2.5/weather?lat="
+                        + lat + "&lon=" + lng + "&units=imperial&APPID=" + openWeatherMapKey;
+    request = new XMLHttpRequest();
+    request.onload = processResults;
+    request.open("get", requestString, false);
+    request.send();
+  };
+  // Take the JSON results and proccess them
+  var processResults = function() {
+    weather = JSON.parse(this.responseText);
+    console.log(this.responseText);
+    console.log("yeet");
+  };
   function createMarker(place) {
+      var lat = place.geometry.location.lat();
+      var lng = place.geometry.location.lng();
+      getWeather(lat, lng);
+      console.log(weather);
       var photos = place.photos;
       var marker = new google.maps.Marker({
           map: map,
           position: place.geometry.location
         });
+      markers.push(marker);
+
       var photoHtml = '';
       if(photos){
         photoHtml = '<img style="width:80px;height:60px;" src=' + photos[0].getUrl() + '>';
@@ -29,9 +55,10 @@ function initMap() {
       }
 
       var infoWindowHtml = '<div>' + photoHtml + '<br>' + '<strong>' + place.name + '</strong><br>' +
-                'Place Type: ' + place.types.join(', ') + '</div>';
+                'Place Type: ' + place.types.join(', ') + '<br>Nearest Town: ' + weather.name +
+                ', Temperature: ' + weather.main.temp + '&deg;F</div>';
 
-      markers.push(marker);
+
       google.maps.event.addListener(marker, 'click', function() {
         infowindow.setContent(infoWindowHtml);
         infowindow.open(map, this);
@@ -80,6 +107,7 @@ function initMap() {
 
   });*/
   }
+
   function deleteMarkers() {
     for (var i = 0; i < markers.length; i++) {
       markers[i].setMap(null);
