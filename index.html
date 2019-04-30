@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-
-	<title>Drawing Tools</title>
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
       #map {
-        height: 100%;
+        height: 70%;
       }
       /* Optional: Makes the sample page fill the window. */
       html, body {
@@ -21,8 +22,18 @@
   </head>
   <body>
     <div id="map"></div>
+		<div class="container">
+			<div class="row">
+				<div class="col-12">
+					<h1 class="display-1 bg-danger"><em>Around the world in 80 lines</em></h1>
+				</div>
+    		<div class="col-12" id="latLng">
+    		</div>
+    		<div class="col-8" id=placeInfo>
+    		</div>
+			</div>
+		</div>
 <script src="map.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD6k89pq9RQOeP-TqsKrdviCOUWC8W24AA&callback=initMap&libraries=places">
     </script>
