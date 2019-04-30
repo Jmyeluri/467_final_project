@@ -1,5 +1,6 @@
 var map;
 var markers = [];
+var polyLines = [];
 function initMap() {
   var elevator;
   var myOptions = {
@@ -373,7 +374,7 @@ var symbolTwo = {
 
   $(document).keyup(function(e) {
      if (e.key === "Escape") { // escape key maps to keycode `27`
-       polyLine.setMap(null);
+       deletePolyLines();
        deleteMarkers();
     }
 });
@@ -427,6 +428,12 @@ $(document).on('click', '.linePoint', function () {
     }
     markers = [];
   }
+  function deletePolyLines() {
+    for (var i = 0; i < polyLines.length; i++) {
+      polyLines[i].setMap(null);
+    }
+    polyLines = [];
+  }
   var geocoder = new google.maps.Geocoder;
   var infowindow = new google.maps.InfoWindow;
   polyLine = new google.maps.Polyline({
@@ -439,7 +446,7 @@ $(document).on('click', '.linePoint', function () {
           strokeOpacity: 0.7,
           strokeWeight: 8
         });
-
+  polyLines.push(polyLine);
   // Add a listener for idle event and call getElevation on a random set of marker in the bound
   google.maps.event.addListener(map, 'click', function () {
     //polyLine.setMap(null);
@@ -454,6 +461,7 @@ $(document).on('click', '.linePoint', function () {
         strokeOpacity: 0.7,
         strokeWeight: 8
       });
+      polyLines.push(polyLine);
     google.maps.event.addListener(map, 'mousemove', function (event) {
         count++;
         var lat = event.latLng.lat();
@@ -461,12 +469,12 @@ $(document).on('click', '.linePoint', function () {
         var latLng = new google.maps.LatLng(lat, lng)
         console.log(count);
         polyLine.getPath().push(latLng);
-        if(count % 20 == 0){
+        if(count % 10 == 0){
           coords.push(latLng);
             console.log(lat);
             console.log(lng);
             console.log()
-            $("<button class='btn btn-success linePoint' type='button' latLng=" + latLng + " data-toggle='collapse' data-target='#collapseExample' aria-expanded='false' aria-controls='collapseExample'>" + String(count/20) + ") ,"+ lat + ',' + lng +"</button>").appendTo('#latLng');
+            $("<button class='btn btn-success linePoint' type='button' latLng=" + latLng + " data-toggle='collapse' data-target='#collapseExample' aria-expanded='false' aria-controls='collapseExample'>" + String(count/10) + ") ,"+ lat + ',' + lng +"</button>").appendTo('#latLng');
           geocodeLatLng(geocoder, map, infowindow, latLng);
         }
         google.maps.event.addListener(polyLine, 'click', function(event) {
