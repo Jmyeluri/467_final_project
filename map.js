@@ -1,5 +1,6 @@
+var map;
+var markers = [];
 function initMap() {
-  var map;
   var elevator;
   var myOptions = {
   zoom: 6,
@@ -277,7 +278,6 @@ function initMap() {
       ]
 
       });
-  var markers = [];
 
   var isDrawing = false;
   var overlay = new google.maps.OverlayView();
@@ -339,7 +339,8 @@ var symbolTwo = {
       var marker = new google.maps.Marker({
            map: map,
            icon: symbolOne,
-           position: place.geometry.location
+           position: place.geometry.location,
+           data: place.types
          });
       markers.push(marker);
 
@@ -405,6 +406,7 @@ $(document).on('click', '.linePoint', function () {
             position: latLng,
             map: map,
             icon: symbolTwo,
+            data: results[0].types
           });
           markers.push(marker);
           infowindow.setContent("<strong>" + placeCount + "</strong>" + results[0].formatted_address);
@@ -472,4 +474,20 @@ $(document).on('click', '.linePoint', function () {
         });
     });
   });
+}
+function filterMarkers() {
+  var place_type = document.getElementById("Select1").value;
+  if (place_type == "") {
+    console.log(markers);
+    for (var i = 0; i < markers.length; i++) {
+        markers[i].setVisible(true);
+    }
+  }
+  else{
+    for (var i = 0; i < markers.length; i++) {
+      if (!markers[i].data.includes(place_type)) {
+        markers[i].setVisible(false);
+      }
+    }
+  }
 }
