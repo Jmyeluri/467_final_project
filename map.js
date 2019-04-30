@@ -18,24 +18,22 @@ function initMap() {
 
   function createMarker(place) {
       var photos = place.photos;
+      var marker = new google.maps.Marker({
+          map: map,
+          position: place.geometry.location
+        });
+      var photoHtml = '';
       if(photos){
-        var marker = new google.maps.Marker({
-          map: map,
-          position: place.geometry.location,
-          icon: photos[0].getUrl({maxWidth: 35, maxHeight: 35})
-        });
+        photoHtml = '<img style="width:80px;height:60px;" src=' + photos[0].getUrl() + '>';
+        console.log(photoHtml);
       }
-      else{
-        var marker = new google.maps.Marker({
-          map: map,
-          position: place.geometry.location,
-        });
-      }
+
+      var infoWindowHtml = '<div>' + photoHtml + '<br>' + '<strong>' + place.name + '</strong><br>' +
+                'Place Type: ' + place.types.join(', ') + '</div>';
+
       markers.push(marker);
       google.maps.event.addListener(marker, 'click', function() {
-        infowindow.setContent(('<div><strong>' + place.name + '</strong><br>' +
-                  'Place ID: ' + place.place_id + '<br>' +
-                  place.types + '</div>'));
+        infowindow.setContent(infoWindowHtml);
         infowindow.open(map, this);
       });
     }
@@ -43,6 +41,7 @@ function initMap() {
 
 
   function callback(results, status) {
+    console.log(status);
     if (status == google.maps.places.PlacesServiceStatus.OK) {
       for (var i = 0; i < results.length; i++) {
         var place = results[i];
@@ -56,7 +55,7 @@ function initMap() {
   function geocodeLatLng(geocoder, map, infowindow, latLng) {
   var placesRequest = {
     location: latLng,
-    radius: '500'
+    radius: '300'
   };
   service = new google.maps.places.PlacesService(map);
   service.nearbySearch(placesRequest, callback);
