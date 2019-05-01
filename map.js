@@ -347,13 +347,12 @@ var symbolTwo = {
 
       var photoHtml = '';
       if(photos){
-        photoHtml = '<img style="width:200px;height:180px;" src=' + photos[0].getUrl() + '>';
+        photoHtml = '<img style="width:350px;height:330px;" src=' + photos[0].getUrl() + '>';
       }
 
       var infoWindowHtml = '<div>' + photoHtml + '<br>' + '<strong>' + place.name + '</strong><br>' +
                 '<strong>Place Type:</strong> ' + place.types.join(', ') + '<br><strong>Nearest Town: </strong>' + weather.name +
-                ', <strong>Temperature: </strong>' + weather.main.temp + '&deg;F</div>';
-
+                ', <strong>Temperature: </strong>' + weather.main.temp + '&deg;F</div><br>' + '<img src="http://openweathermap.org/img/w/' + weather.weather[0].icon + '.png">';
 
       google.maps.event.addListener(marker, 'click', function() {
         infowindow.setContent(infoWindowHtml);
@@ -367,6 +366,9 @@ var symbolTwo = {
     if (status == google.maps.places.PlacesServiceStatus.OK) {
       for (var i = 0; i < results.length; i++) {
         var place = results[i];
+        if(i > 5){
+          return;
+        }
         createMarker(results[i]);
       }
     }
@@ -469,12 +471,13 @@ $(document).on('click', '.linePoint', function () {
         var latLng = new google.maps.LatLng(lat, lng)
         console.log(count);
         polyLine.getPath().push(latLng);
-        if(count % 10 == 0){
+        var freq = 10;
+        if(count % freq == 0){
           coords.push(latLng);
             console.log(lat);
             console.log(lng);
             console.log()
-            $("<button class='btn btn-success linePoint' type='button' latLng=" + latLng + " data-toggle='collapse' data-target='#collapseExample' aria-expanded='false' aria-controls='collapseExample'>" + String(count/10) + ") ,"+ lat + ',' + lng +"</button>").appendTo('#latLng');
+            $("<button class='btn btn-success linePoint' type='button' latLng=" + latLng + " data-toggle='collapse' data-target='#collapseExample' aria-expanded='false' aria-controls='collapseExample'>" + String(count/freq) + ") ,"+ lat + ',' + lng +"</button>").appendTo('#latLng');
           geocodeLatLng(geocoder, map, infowindow, latLng);
         }
         google.maps.event.addListener(polyLine, 'click', function(event) {
